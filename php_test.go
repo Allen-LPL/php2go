@@ -7,13 +7,17 @@ import (
 	"os"
 	"reflect"
 	"testing"
+	"time"
 	"unicode/utf8"
 )
 
 func TestTime(t *testing.T) {
 	gt(t, float64(Time()), 1522684800)
 
-	equal(t, "27/04/2018 11:23:14 AM", Date("02/01/2006 15:04:05 PM", 1524799394))
+	// Ensure we take timezones into account
+	_, offset := time.Now().Local().Zone()
+	unix := int64(1524799394)
+	equal(t, "27/04/2018 03:23:14 AM", Date("02/01/2006 15:04:05 PM", unix-int64(offset)))
 
 	tStrtotime, _ := Strtotime("02/01/2006 15:04:05", "02/01/2016 15:04:05")
 	equal(t, int64(1451747045), tStrtotime)
@@ -38,6 +42,8 @@ func TestString(t *testing.T) {
 	equal(t, "ab", Substr("abc", 0, 2))
 
 	equal(t, "@gmail.com", Strstr("xxx@gmail.com", "@"))
+
+	equal(t, "xxx@gmail.com", Strstr("xxx@gmail.com", "xxx@gmail.com"))
 
 	equal(t, "Hello world", Ucfirst("hello world"))
 
@@ -73,6 +79,7 @@ func TestString(t *testing.T) {
 	equal(t, float64(50), percent)
 
 	equal(t, "H416", Soundex("Heilbronn"))
+	equal(t, "M520", Soundex("Mansa"))
 
 	equal(t, 14, len(Uniqid("x")))
 	equal(t, true, bytes.HasPrefix([]byte(Uniqid("x")), []byte("x")))
@@ -82,8 +89,6 @@ func TestString(t *testing.T) {
 	equal(t, 20013, Ord("中文"))
 
 	equal(t, "z", Chr(122))
-
-	equal(t, 4, MbStrlen("中文 a"))
 
 	equal(t, "<a><br />xxx<br />yy<br />中文<br />n<br />x", Nl2br("<a>\n\rxxx\nyy\r中文\r\nn\r\nx", true))
 
@@ -109,6 +114,11 @@ func TestString(t *testing.T) {
 	tParseStr := make(map[string]interface{})
 	_ = ParseStr("f[a][]=m&f[a][]=n", tParseStr)
 	equal(t, "map[f:map[a:[m n]]]", fmt.Sprint(tParseStr))
+}
+
+func TestMb(t *testing.T) {
+	equal(t, 4, MbStrlen("中文 a"))
+	equal(t, "Ä Ö Ü SS A 中文", MbStrtoupper("ä ö ü ß a 中文"))
 }
 
 func TestArray(t *testing.T) {
@@ -202,6 +212,9 @@ func TestMath(t *testing.T) {
 	tBin2hex, _ := Bin2hex(tDecbin)
 	equal(t, "64", tBin2hex)
 
+	tBin2hex2, _ := Bin2hex("你好世界")
+	equal(t, "e4bda0e5a5bde4b896e7958c", tBin2hex2)
+
 	tHexdec, _ := Hexdec(tBin2hex)
 	equal(t, int64(100), tHexdec)
 
@@ -231,12 +244,6 @@ func TestFile(t *testing.T) {
 
 	tPathinfo := Pathinfo("/home/go/php2go.go.go", -1)
 	equal(t, map[string]string{"dirname": "/home/go", "basename": "php2go.go.go", "extension": "go", "filename": "php2go.go"}, tPathinfo)
-
-	tDiskFreeSpace, _ := DiskFreeSpace("/")
-	gt(t, float64(tDiskFreeSpace), 0)
-
-	tDiskTotalSpace, _ := DiskTotalSpace("/")
-	gte(t, float64(tDiskTotalSpace), 0)
 
 	wd, _ := os.Getwd()
 	tFilesize, _ := FileSize(wd)

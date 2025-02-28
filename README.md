@@ -18,6 +18,7 @@ go get github.com/syyongx/php2go
 Go 1.10 or above.
 
 ## PHP Functions
+
 ### Date/Time Functions
 ```php
 time()
@@ -45,7 +46,6 @@ chunk_split()
 str_word_count()
 wordwrap()
 strlen()
-mb_strlen()
 str_repeat()
 strstr()
 strtr()
@@ -75,6 +75,12 @@ levenshtein()
 similar_text()
 soundex()
 parse_str()
+```
+
+### Multibyte String Functions
+```php
+mb_strlen()
+mb_strtoupper()
 ```
 
 ### URL Functions
@@ -132,6 +138,12 @@ decoct()
 Octdec()
 base_convert()
 is_nan()
+```
+
+### CSPRNG Functions
+```php
+random_bytes()
+random_int()
 ```
 
 ### Directory/Filesystem Functions
@@ -195,6 +207,7 @@ die()
 getenv()
 putenv()
 memory_get_usage()
+memory_get_peak_usage()
 version_compare()
 zip_open()
 Ternary(condition bool, trueVal, falseVal interface{}) interface{}
